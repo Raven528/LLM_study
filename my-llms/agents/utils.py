@@ -5,7 +5,7 @@ from openai import OpenAI
 
 client = OpenAI(
     # 若没有配置环境变量，请用百炼API Key将下行替换为：api_key="sk-xxx",
-    api_key="sk-a3aaa3ac792840e5b9755cf05c6afcb1",
+    api_key=os.getenv('DASHSCOPE_API_KEY'),
     base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
 )
 def llm_call(prompt, system_prompt = 'You are a helpful assistant.'):
