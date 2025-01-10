@@ -8,9 +8,25 @@ client_qwen = OpenAI(
     api_key=os.getenv('DASHSCOPE_API_KEY'),
     base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
 )
-def llm_call(prompt, system_prompt = 'You are a helpful assistant.'):
+
+client_deepseek = OpenAI(
+    api_key=os.getenv('DEEPSEEK_API_KEY'), 
+    base_url="https://api.deepseek.com",
+)
+
+
+def llm_call_qwen(prompt, system_prompt = 'You are a helpful assistant.'):
     response = client_qwen.chat.completions.create(
         model="qwen-plus-1220",   # 模型列表：https://help.aliyun.com/zh/model-studio/getting-started/models
+        messages=[
+            {'role': 'system', 'content': system_prompt},
+            {'role': 'user', 'content': prompt}],
+        ) 
+    return response.choices[0].message.content
+
+def llm_call_deepseek(prompt, system_prompt = 'You are a helpful assistant.'):
+    response = client_deepseek.chat.completions.create(
+        model="deepseek-chat",
         messages=[
             {'role': 'system', 'content': system_prompt},
             {'role': 'user', 'content': prompt}],
@@ -33,4 +49,4 @@ def extract_xml(text: str, tag: str) -> str:
     return match.group(1) if match else ""
 
 if __name__ == "__main__":
-    print(llm_call('你好'))
+    print(llm_call_deepseek('你好,请介绍一下你自己'))
