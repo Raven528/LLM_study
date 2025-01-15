@@ -10,7 +10,7 @@ client_qwen = OpenAI(
 )
 
 client_deepseek = OpenAI(
-    api_key=os.getenv('DEEPSEEK_API_KEY'), 
+    api_key=os.getenv('DEEPSEEK_API_KEY'),
     base_url="https://api.deepseek.com",
 )
 
@@ -24,15 +24,27 @@ def llm_call_qwen(prompt, system_prompt = 'You are a helpful assistant.'):
         ) 
     return response.choices[0].message.content
 
-def llm_call_deepseek(prompt, system_prompt = 'You are a helpful assistant.'):
+def llm_call_deepseek(prompt, system_prompt = 'You are a helpful assistant.',tools=None, tool_choice="auto"):
     response = client_deepseek.chat.completions.create(
         model="deepseek-chat",
         messages=[
             {'role': 'system', 'content': system_prompt},
             {'role': 'user', 'content': prompt}],
-        ) 
+        tools = tools,
+        tool_choice=tool_choice,
+    )
     return response.choices[0].message.content
 
+def llm_call_deepseek_message(prompt, system_prompt = 'You are a helpful assistant.',tools=None, tool_choice="auto"):
+    response = client_deepseek.chat.completions.create(
+        model="deepseek-chat",
+        messages=[
+            {'role': 'system', 'content': system_prompt},
+            {'role': 'user', 'content': prompt}],
+        tools = tools,
+        tool_choice=tool_choice,
+    )
+    return response.choices[0].message
 
 def extract_xml(text: str, tag: str) -> str:
     """
