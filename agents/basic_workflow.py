@@ -1,6 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
 from typing import List, Dict, Callable
-from utils import llm_call, extract_xml
+from utils import llm_call_deepseek as llm_call, extract_xml
 
 def chain(input: str, prompts: List) -> str:
     """Chain multiple LLM calls sequentially, passing results between steps."""
