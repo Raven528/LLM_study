@@ -2,6 +2,7 @@ from concurrent.futures import ThreadPoolExecutor
 from typing import List, Dict, Callable
 from utils import llm_call_deepseek as llm_call, extract_xml
 
+
 def chain(input: str, prompts: List) -> str:
     """Chain multiple LLM calls sequentially, passing results between steps."""
     result = input
@@ -11,11 +12,13 @@ def chain(input: str, prompts: List) -> str:
         print(result)
     return result
 
+
 def parallel(prompt: str, inputs: List[str], n_workers: int = 3) -> List[str]:
     """Process multiple inputs concurrently with the same prompt."""
     with ThreadPoolExecutor(max_workers=n_workers) as executor:
         futures = [executor.submit(llm_call, f"{prompt}\nInput: {x}") for x in inputs]
         return [f.result() for f in futures]
+
 
 def route(input: str, routes: Dict[str, str]) -> str:
     """Route input to specialized prompt using content classification."""
@@ -35,18 +38,19 @@ def route(input: str, routes: Dict[str, str]) -> str:
     </selection>
 
     Input: {input}""".strip()
-    
+
     route_response = llm_call(selector_prompt)
-    reasoning = extract_xml(route_response, 'reasoning')
-    route_key = extract_xml(route_response, 'selection').strip().lower()
-    
+    reasoning = extract_xml(route_response, "reasoning")
+    route_key = extract_xml(route_response, "selection").strip().lower()
+
     print("Routing Analysis:")
     print(reasoning)
     print(f"\nSelected route: {route_key}")
-    
+
     # Process input with selected specialized prompt
     selected_prompt = routes[route_key]
     return llm_call(f"{selected_prompt}\nInput: {input}")
+
 
 def demo1():
     # Example 1: Chain workflow for structured data extraction and formatting
@@ -58,24 +62,21 @@ def demo1():
         Example format:
         92: customer satisfaction
         45%: revenue growth""",
-        
         """Convert all numerical values to percentages where possible.
         If not a percentage or points, convert to decimal (e.g., 92 points -> 92%).
         Keep one number per line.
         Example format:
         92%: customer satisfaction
         45%: revenue growth""",
-        
         """Sort all lines in descending order by numerical value.
         Keep the format 'value: metric' on each line.
         Example:
         92%: customer satisfaction
         87%: employee satisfaction""",
-        
         """Format the sorted data as a markdown table with columns:
         | Metric | Value |
         |:--|--:|
-        | Customer Satisfaction | 92% |"""
+        | Customer Satisfaction | 92% |""",
     ]
 
     report = """
@@ -95,6 +96,7 @@ def demo1():
     formatted_result = chain(report, data_processing_steps)
     print(formatted_result)
 
+
 def demo2():
     # Example 2: Parallelization workflow for stakeholder impact analysis
     # Process impact analysis for multiple stakeholder groups concurrently
@@ -104,32 +106,30 @@ def demo2():
         - Price sensitive
         - Want better tech
         - Environmental concerns""",
-        
         """Employees:
         - Job security worries
         - Need new skills
         - Want clear direction""",
-        
         """Investors:
         - Expect growth
         - Want cost control
         - Risk concerns""",
-        
         """Suppliers:
         - Capacity constraints
         - Price pressures
-        - Tech transitions"""
+        - Tech transitions""",
     ]
 
     impact_results = parallel(
         """Analyze how market changes will impact this stakeholder group.
         Provide specific impacts and recommended actions.
         Format with clear sections and priorities.""",
-        stakeholders
+        stakeholders,
     )
 
     for result in impact_results:
         print(result)
+
 
 def demo3():
     # Example 3: Route workflow for customer support ticket handling
@@ -146,7 +146,6 @@ def demo3():
         Keep responses professional but friendly.
         
         Input: """,
-        
         "technical": """You are a technical support engineer. Follow these guidelines:
         1. Always start with "Technical Support Response:"
         2. List exact steps to resolve the issue
@@ -157,7 +156,6 @@ def demo3():
         Use clear, numbered steps and technical details.
         
         Input: """,
-        
         "account": """You are an account security specialist. Follow these guidelines:
         1. Always start with "Account Support Response:"
         2. Prioritize account security and verification
@@ -168,7 +166,6 @@ def demo3():
         Maintain a serious, security-focused tone.
         
         Input: """,
-        
         "product": """You are a product specialist. Follow these guidelines:
         1. Always start with "Product Support Response:"
         2. Focus on feature education and best practices
@@ -178,28 +175,26 @@ def demo3():
         
         Be educational and encouraging in tone.
         
-        Input: """
+        Input: """,
     }
 
-# Test with different support tickets
+    # Test with different support tickets
     tickets = [
         """Subject: Can't access my account
         Message: Hi, I've been trying to log in for the past hour but keep getting an 'invalid password' error. 
         I'm sure I'm using the right password. Can you help me regain access? This is urgent as I need to 
         submit a report by end of day.
         - John""",
-        
         """Subject: Unexpected charge on my card
         Message: Hello, I just noticed a charge of $49.99 on my credit card from your company, but I thought
         I was on the $29.99 plan. Can you explain this charge and adjust it if it's a mistake?
         Thanks,
         Sarah""",
-        
         """Subject: How to export data?
         Message: I need to export all my project data to Excel. I've looked through the docs but can't
         figure out how to do a bulk export. Is this possible? If so, could you walk me through the steps?
         Best regards,
-        Mike"""
+        Mike""",
     ]
 
     print("Processing support tickets...\n")
@@ -215,8 +210,3 @@ def demo3():
 
 if __name__ == "__main__":
     demo3()
-
-
-
-
-
