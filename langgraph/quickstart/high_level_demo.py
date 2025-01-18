@@ -34,5 +34,8 @@ final_state = app.invoke(
     {"messages": [{"role": "user", "content": "what is the weather in sf"}]},
     config={"configurable": {"thread_id": 42}},
 )
+import pdb
+
+pdb.set_trace()
 final_state["messages"][-1].content
 print(final_state["messages"])
