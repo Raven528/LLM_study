@@ -28,8 +28,6 @@ ai_prompt = [
     },
     {"role": "user", "content": "家里食物够吗，不够的话开车买菜天气合适吗？"},
 ]
-# f_response = chat_completions(ai_prompt).content
-# ai_prompt.append({"role": "assistant", "content": f_response})
 
 # Step 5: Extract functions dynamically based on the function_schemas
 ai_functions = [function_schemas[key] for key in available_functions.keys()]
