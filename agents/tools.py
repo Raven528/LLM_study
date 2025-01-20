@@ -95,12 +95,34 @@ def get_article_outline(article):
     return response.content
 
 
+class get_prompt_scheme(BaseModel):
+    content: str = Field(description="用户需求的描述")
+
+
+def get_prompt(content):
+    prompt = [
+        {
+            "role": "system",
+            "content": """
+                你是一位大模型提示词生成专家，请根据用户的需求编写一个智能助手的提示词，来指导大模型进行内容生成，要求：
+                1. 以 Markdown 格式输出
+                2. 贴合用户需求，描述智能助手的定位、能力、知识储备
+                3. 提示词应清晰、精确、易于理解，在保持质量的同时，尽可能简洁
+                4. 只输出提示词，不要输出多余解释""",
+        },
+        {"role": "user", "content": f"请生成能够满足{content}的提示词"},
+    ]
+    response = chat_completions(prompt)
+    return response.content
+
+
 # Function map to easily look up function by name
 available_functions = {
     "get_weather": get_weather,
     "get_car_power": get_car_power,
     "get_food": get_food,
     "get_article_outline": get_article_outline,
+    "get_prompt": get_prompt,
 }
 
 # Step 2: Define the function schema (parameter definitions) in a separate structure
@@ -120,4 +142,4 @@ if __name__ == "__main__":
 
     pdb.set_trace()
     # print(pydantic_function_tool(get_weather_scheme, name="demo"))
-    print(get_article_outline("大学之道，在明明德，在新明，在止于至善"))
+    print(get_prompt("如何从对话文本中获取价格、金额、是否达成一致等元素"))
